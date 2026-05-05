@@ -1,0 +1,70 @@
+version: 2
+
+project_name: neartrace-enroll
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: enroll-cli
+    main: ./cmd/enroll
+    binary: enroll
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.ShortCommit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: enroll-cli
+    builds: [enroll-cli]
+    name_template: "neartrace-enroll_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: code-hartle-tech
+    name: neartrace-enroll
+  name_template: "v{{ .Version }}"
+  draft: false
+  prerelease: auto
+  footer: |
+    ## Install
+
+    **One-liner (macOS / Linux):**
+    ```bash
+    curl -fsSL https://neartrace.app/install.sh | bash
+    ```
+
+    **Manual:** download the binary for your platform above, make it executable, move to `/usr/local/bin`.
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
