@@ -29,9 +29,18 @@ builds:
       - -X main.date={{.Date}}
 
 archives:
-  - id: enroll-cli
+  - id: enroll-cli-versioned
     builds: [enroll-cli]
     name_template: "neartrace-enroll_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - LICENSE
+  - id: enroll-cli-latest
+    builds: [enroll-cli]
+    name_template: "neartrace-enroll_latest_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
         formats: [zip]
